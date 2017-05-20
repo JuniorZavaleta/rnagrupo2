@@ -29,13 +29,13 @@ np.random.seed(1)
 
 # randomly initialize our weights with mean 0
 
-hidden_net = 20
+hidden_net = 4
 
 syn0 = 2*np.random.random((len(X[0]),hidden_net)) - 1
 syn1 = 2*np.random.random((hidden_net,len(Y[0]))) - 1
 
 errors = []
-for j in xrange(6000):
+for j in xrange(10000):
 
     # Feed forward through layers 0, 1, and 2
     l0 = X
@@ -45,9 +45,12 @@ for j in xrange(6000):
     # how much did we miss the target value?
     l2_error = y - l2
 
-    if (j% 100) == 0:
+    #if (j% 100) == 0:
+    if np.mean(np.abs(l2_error)) < 0.01:
         errors.append(np.mean(np.abs(l2_error)))
-        print "Error:" + str(np.mean(np.abs(l2_error)))
+    if errors.append(np.mean(np.abs(l2_error))) > 0.004:
+        errors.append(1.0003 * np.mean(np.abs(l2_error)))
+    print "Error:" + str(np.mean(np.abs(l2_error)))
 
     # in what direction is the target value?
     # were we really sure? if so, don't change too much.
