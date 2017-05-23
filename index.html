@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RNA Grid</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style type="text/css">
+      .btn-grid { background: white; color: black; }
+      .btn-grid.active { background: black; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="row">
+                <h2>RNA</h2>
+            </div>
+        </div>
+    </div>
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-xs-4 col-sm-2">
+            <div class="form-group">
+                <input id="columns" type="number" name="columns" placeholder="Columnas" class="form-control">
+            </div>
+        </div>
+        <div class="col-xs-4 col-sm-2">
+            <div class="row">
+                <div class="form-group">
+                    <input id="rows" type="number" name="rows" placeholder="Filas" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4 col-xs-offset-2 col-sm-2 col-sm-offset-1">
+            <div class="row">
+                <div class="form-group">
+                    <button class="btn" id="btn_generate">Generar Grid</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Grid generado -->
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-2" id="grid_container">
+        </div>
+    </div>
+    <!-- Add button -->
+    <div class="row">
+        <div class="col-xs-4 col-xs-offset-2 col-sm-2 col-sm-offset-1">
+            <button class="btn" id="btn-add">Add</button>
+        </div>
+    </div>
+    <!-- Table preview -->
+    <div class="row">
+        <h3>Table</h3>
+        <table class="table" id="table">
+            <tbody></tbody>
+        </table>
+    </div>
+    <!-- Boton CSV -->
+    <div class="row" id="row-csv" hidden>
+        <div class="col-xs-4 col-xs-offset-2 col-sm-2 col-sm-offset-1">
+            <button class="btn btn-primary" id="btn_csv">Generar CSV</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(function(){
+    var btn_generate = $("#btn_generate");
+
+    btn_generate.click(function(){
+        var rows = parseInt($("#rows").val());
+        var columns = parseInt($("#columns").val());
+
+        for(var i = 1; i <= rows; i++) {
+            var row_container = $("<div>", {
+                "class": "row",
+            });
+
+            for(var j = 1; j <= columns; j++) {
+                var div = $("<button>", {
+                    "class": "btn btn-grid",
+                    "data-row": i,
+                    "data-column": j,
+                    "text": 0
+                });
+
+                row_container.append(div);
+            }
+
+            $("#grid_container").append(row_container);
+        }
+
+        $("#row-csv").show();
+    });
+
+    $("body").on("click", ".btn-grid", function(){
+        $(this).toggleClass("active");
+        $(this).text( $(this).text() == 0 ? 1 : 0 );
+    });
+
+    $("#btn-add").click(function(){
+        var data_row = $('.btn-grid').map(function(e,i) { return i.innerHTML });
+        var markup = "<tr>";
+        data_row.each(function(e, i){
+            markup += "<td>"+i+"</td>";
+        })
+        markup += "</tr>";
+        $("#table tbody").append(markup);
+    });
+
+    $("#btn_csv").click(function(){
+        var data = [];
+        $('#table tr').each(function(e,i){
+            return $(i).each(function(a,b){
+                data.push(b.innerText.split("\t"));
+            });
+        });
+
+        // Cortesia de Stack Over Flow
+        var csvContent = "data:text/csv;charset=utf-8,";
+        data.forEach(function(infoArray, index){
+           dataString = infoArray.join(",");
+           csvContent += index < data.length ? dataString+ "\n" : dataString;
+        });
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click();
+    });
+});
+</script>
+</body>
+</html>
